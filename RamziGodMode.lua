@@ -1,6 +1,6 @@
--- Ramzi GodMode - Voxels Script
+-- Ramzi GodMode - Voxels Script (Mobile Compatible)
 -- Features: GodMode, GodMode Pro, KillAura, OP KillAura V2, Fly, Fly Speed, SpeedWalk
--- Custom UI for Delta and Xeno
+-- Custom UI for Delta and Xeno with Mobile Support
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -23,7 +23,7 @@ local config = {
     speedWalkMultiplier = 2,
     killAuraRange = 50,
     killAuraSpeed = 0.1,
-    uiVisible = true,
+    uiVisible = false, -- Start hidden
 }
 
 -- Check if player is Delta or Xeno
@@ -36,29 +36,83 @@ screenGui.Name = "RamziGodModeUI"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = player:WaitForChild("PlayerGui")
 
--- Title
+-- TOGGLE BUTTON (Always Visible)
+local toggleButton = Instance.new("TextButton")
+toggleButton.Name = "ToggleButton"
+toggleButton.Size = UDim2.new(0, 60, 0, 60)
+toggleButton.Position = UDim2.new(0, 20, 0, 20)
+toggleButton.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+toggleButton.BorderColor3 = Color3.fromRGB(0, 255, 150)
+toggleButton.BorderSizePixel = 3
+toggleButton.TextColor3 = Color3.fromRGB(0, 255, 150)
+toggleButton.TextSize = 32
+toggleButton.Font = Enum.Font.GothamBold
+toggleButton.Text = "⚡"
+toggleButton.Parent = screenGui
+
+-- Add rounded corners effect
+local toggleCorner = Instance.new("UICorner")
+toggleCorner.CornerRadius = UDim.new(0, 8)
+toggleCorner.Parent = toggleButton
+
+-- Main Content Frame (Hidden by default)
+local contentFrame = Instance.new("Frame")
+contentFrame.Name = "ContentFrame"
+contentFrame.Size = UDim2.new(0, 320, 0, 550)
+contentFrame.Position = UDim2.new(0, 20, 0, 20)
+contentFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
+contentFrame.BorderColor3 = Color3.fromRGB(0, 255, 150)
+contentFrame.BorderSizePixel = 2
+contentFrame.Visible = config.uiVisible
+contentFrame.Parent = screenGui
+
+-- Add corner to content frame
+local contentCorner = Instance.new("UICorner")
+contentCorner.CornerRadius = UDim.new(0, 8)
+contentCorner.Parent = contentFrame
+
+-- Title with Close Button
+local titleFrame = Instance.new("Frame")
+titleFrame.Name = "TitleFrame"
+titleFrame.Size = UDim2.new(1, 0, 0, 50)
+titleFrame.Position = UDim2.new(0, 0, 0, 0)
+titleFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 35)
+titleFrame.BorderSizePixel = 0
+titleFrame.Parent = contentFrame
+
 local titleLabel = Instance.new("TextLabel")
 titleLabel.Name = "Title"
-titleLabel.Size = UDim2.new(0, 300, 0, 40)
-titleLabel.Position = UDim2.new(0, 20, 0, 20)
-titleLabel.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
-titleLabel.BorderColor3 = Color3.fromRGB(0, 255, 150)
-titleLabel.BorderSizePixel = 2
+titleLabel.Size = UDim2.new(0, 250, 0, 50)
+titleLabel.Position = UDim2.new(0, 10, 0, 0)
+titleLabel.BackgroundTransparency = 1
 titleLabel.TextColor3 = Color3.fromRGB(0, 255, 150)
-titleLabel.TextSize = 24
+titleLabel.TextSize = 20
 titleLabel.Font = Enum.Font.GothamBold
 titleLabel.Text = "⚡ RAMZI GODMODE"
-titleLabel.Parent = screenGui
+titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+titleLabel.Parent = titleFrame
+
+-- Close Button
+local closeButton = Instance.new("TextButton")
+closeButton.Name = "CloseButton"
+closeButton.Size = UDim2.new(0, 50, 0, 50)
+closeButton.Position = UDim2.new(1, -50, 0, 0)
+closeButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+closeButton.BorderSizePixel = 0
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.TextSize = 24
+closeButton.Font = Enum.Font.GothamBold
+closeButton.Text = "✕"
+closeButton.Parent = titleFrame
 
 -- Status Frame
 local statusFrame = Instance.new("Frame")
 statusFrame.Name = "StatusFrame"
-statusFrame.Size = UDim2.new(0, 300, 0, 280)
-statusFrame.Position = UDim2.new(0, 20, 0, 70)
+statusFrame.Size = UDim2.new(1, -20, 0, 280)
+statusFrame.Position = UDim2.new(0, 10, 0, 60)
 statusFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
-statusFrame.BorderColor3 = Color3.fromRGB(0, 255, 150)
-statusFrame.BorderSizePixel = 2
-statusFrame.Parent = screenGui
+statusFrame.BorderSizePixel = 0
+statusFrame.Parent = contentFrame
 
 -- Status Labels
 local statusLabels = {}
@@ -72,10 +126,10 @@ local features = {
 }
 
 for i, feature in ipairs(features) do
-    local statusLabel = Instance.new("TextLabel")
+    local statusLabel = Instance.new("TextButton")
     statusLabel.Name = feature
-    statusLabel.Size = UDim2.new(0, 280, 0, 35)
-    statusLabel.Position = UDim2.new(0, 10, 0, 10 + (i-1) * 40)
+    statusLabel.Size = UDim2.new(1, -10, 0, 40)
+    statusLabel.Position = UDim2.new(0, 5, 0, 5 + (i-1) * 45)
     statusLabel.BackgroundColor3 = Color3.fromRGB(25, 25, 40)
     statusLabel.BorderColor3 = Color3.fromRGB(100, 100, 150)
     statusLabel.BorderSizePixel = 1
@@ -86,78 +140,113 @@ for i, feature in ipairs(features) do
     statusLabel.TextXAlignment = Enum.TextXAlignment.Left
     statusLabel.Parent = statusFrame
     
+    -- Add corner to button
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 4)
+    corner.Parent = statusLabel
+    
     table.insert(statusLabels, {
         label = statusLabel,
         feature = feature,
-        key = string.sub(feature, -3, -2) -- Extract key from (X)
+        key = string.sub(feature, -3, -2),
+        index = i
     })
 end
 
 -- Info Label
 local infoLabel = Instance.new("TextLabel")
 infoLabel.Name = "Info"
-infoLabel.Size = UDim2.new(0, 300, 0, 60)
-infoLabel.Position = UDim2.new(0, 20, 0, 370)
+infoLabel.Size = UDim2.new(1, -20, 0, 60)
+infoLabel.Position = UDim2.new(0, 10, 0, 360)
 infoLabel.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
 infoLabel.BorderColor3 = Color3.fromRGB(0, 200, 100)
 infoLabel.BorderSizePixel = 2
 infoLabel.TextColor3 = Color3.fromRGB(0, 200, 100)
-infoLabel.TextSize = 12
+infoLabel.TextSize = 11
 infoLabel.Font = Enum.Font.Gotham
 infoLabel.TextWrapped = true
-infoLabel.Text = "UP/DOWN ▲▼ - Adjust Fly Speed\nPress H to hide/show UI"
-infoLabel.Parent = screenGui
+infoLabel.Text = "UP/DOWN ▲▼ - Adjust Fly Speed\nTap buttons to toggle features"
+infoLabel.Parent = contentFrame
 
 -- Fly Speed Display
 local flySpeedLabel = Instance.new("TextLabel")
 flySpeedLabel.Name = "FlySpeed"
-flySpeedLabel.Size = UDim2.new(0, 300, 0, 30)
-flySpeedLabel.Position = UDim2.new(0, 20, 0, 440)
+flySpeedLabel.Size = UDim2.new(1, -20, 0, 35)
+flySpeedLabel.Position = UDim2.new(0, 10, 0, 430)
 flySpeedLabel.BackgroundColor3 = Color3.fromRGB(20, 25, 35)
 flySpeedLabel.BorderColor3 = Color3.fromRGB(0, 150, 200)
 flySpeedLabel.BorderSizePixel = 2
 flySpeedLabel.TextColor3 = Color3.fromRGB(0, 150, 200)
-flySpeedLabel.TextSize = 14
+flySpeedLabel.TextSize = 13
 flySpeedLabel.Font = Enum.Font.GothamBold
 flySpeedLabel.Text = "🚀 Fly Speed: " .. config.flySpeed
-flySpeedLabel.Parent = screenGui
+flySpeedLabel.Parent = contentFrame
+
+-- Speed Control Buttons
+local speedDownBtn = Instance.new("TextButton")
+speedDownBtn.Name = "SpeedDown"
+speedDownBtn.Size = UDim2.new(0, 50, 0, 35)
+speedDownBtn.Position = UDim2.new(0, 10, 0, 475)
+speedDownBtn.BackgroundColor3 = Color3.fromRGB(100, 50, 50)
+speedDownBtn.BorderSizePixel = 1
+speedDownBtn.BorderColor3 = Color3.fromRGB(150, 100, 100)
+speedDownBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedDownBtn.TextSize = 20
+speedDownBtn.Font = Enum.Font.GothamBold
+speedDownBtn.Text = "▼"
+speedDownBtn.Parent = contentFrame
+
+local speedUpBtn = Instance.new("TextButton")
+speedUpBtn.Name = "SpeedUp"
+speedUpBtn.Size = UDim2.new(0, 50, 0, 35)
+speedUpBtn.Position = UDim2.new(1, -60, 0, 475)
+speedUpBtn.BackgroundColor3 = Color3.fromRGB(50, 100, 50)
+speedUpBtn.BorderSizePixel = 1
+speedUpBtn.BorderColor3 = Color3.fromRGB(100, 150, 100)
+speedUpBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedUpBtn.TextSize = 20
+speedUpBtn.Font = Enum.Font.GothamBold
+speedUpBtn.Text = "▲"
+speedUpBtn.Parent = contentFrame
 
 -- User Info (Only for Delta and Xeno)
 if isAuthorizedUser then
     local userLabel = Instance.new("TextLabel")
     userLabel.Name = "UserInfo"
-    userLabel.Size = UDim2.new(0, 300, 0, 25)
-    userLabel.Position = UDim2.new(0, 20, 0, 475)
+    userLabel.Size = UDim2.new(1, -20, 0, 25)
+    userLabel.Position = UDim2.new(0, 10, 0, 520)
     userLabel.BackgroundColor3 = Color3.fromRGB(30, 20, 20)
     userLabel.BorderColor3 = Color3.fromRGB(255, 100, 0)
     userLabel.BorderSizePixel = 2
     userLabel.TextColor3 = Color3.fromRGB(255, 100, 0)
-    userLabel.TextSize = 12
+    userLabel.TextSize = 11
     userLabel.Font = Enum.Font.GothamBold
     userLabel.Text = "👤 User: " .. playerName .. " [AUTHORIZED]"
-    userLabel.Parent = screenGui
+    userLabel.Parent = contentFrame
 end
 
 -- Update UI function
 local function updateUI()
     for i, statusData in ipairs(statusLabels) do
         local isEnabled = false
-        if i == 1 then isEnabled = config.godMode
-        elseif i == 2 then isEnabled = config.godModePro
-        elseif i == 3 then isEnabled = config.killAura
-        elseif i == 4 then isEnabled = config.opKillAura
-        elseif i == 5 then isEnabled = config.fly
-        elseif i == 6 then isEnabled = config.speedWalkEnabled
+        if statusData.index == 1 then isEnabled = config.godMode
+        elseif statusData.index == 2 then isEnabled = config.godModePro
+        elseif statusData.index == 3 then isEnabled = config.killAura
+        elseif statusData.index == 4 then isEnabled = config.opKillAura
+        elseif statusData.index == 5 then isEnabled = config.fly
+        elseif statusData.index == 6 then isEnabled = config.speedWalkEnabled
         end
         
         if isEnabled then
             statusData.label.TextColor3 = Color3.fromRGB(0, 255, 150)
             statusData.label.Text = "  ● " .. statusData.feature .. " [ON]"
             statusData.label.BorderColor3 = Color3.fromRGB(0, 255, 150)
+            statusData.label.BackgroundColor3 = Color3.fromRGB(35, 60, 35)
         else
             statusData.label.TextColor3 = Color3.fromRGB(200, 200, 200)
             statusData.label.Text = "  ◯ " .. statusData.feature .. " [OFF]"
             statusData.label.BorderColor3 = Color3.fromRGB(100, 100, 150)
+            statusData.label.BackgroundColor3 = Color3.fromRGB(25, 25, 40)
         end
     end
     
@@ -333,10 +422,10 @@ local function toggleSpeedWalk()
     updateUI()
 end
 
--- Toggle UI
-local function toggleUI()
+-- Toggle UI Visibility
+local function toggleUIVisibility()
     config.uiVisible = not config.uiVisible
-    screenGui.Enabled = config.uiVisible
+    contentFrame.Visible = config.uiVisible
     if config.uiVisible then
         print("✓ UI SHOWN")
     else
@@ -344,18 +433,54 @@ local function toggleUI()
     end
 end
 
--- Input Bindings
+-- Button Click Events
+toggleButton.MouseButton1Click:Connect(function()
+    toggleUIVisibility()
+end)
+
+closeButton.MouseButton1Click:Connect(function()
+    toggleUIVisibility()
+end)
+
+speedUpBtn.MouseButton1Click:Connect(function()
+    config.flySpeed = math.min(config.flySpeed + 10, 200)
+    updateUI()
+    print("Fly Speed: " .. config.flySpeed)
+end)
+
+speedDownBtn.MouseButton1Click:Connect(function()
+    config.flySpeed = math.max(config.flySpeed - 10, 10)
+    updateUI()
+    print("Fly Speed: " .. config.flySpeed)
+end)
+
+-- Connect button toggles
+for i, statusData in ipairs(statusLabels) do
+    statusData.label.MouseButton1Click:Connect(function()
+        if statusData.index == 1 then
+            toggleGodMode()
+        elseif statusData.index == 2 then
+            toggleGodModePro()
+        elseif statusData.index == 3 then
+            toggleKillAura()
+        elseif statusData.index == 4 then
+            toggleOpKillAura()
+        elseif statusData.index == 5 then
+            toggleFly()
+        elseif statusData.index == 6 then
+            toggleSpeedWalk()
+        end
+    end)
+end
+
+-- Keyboard Input Bindings (for desktop)
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
     
     if input.KeyCode == Enum.KeyCode.G then
         toggleGodMode()
     elseif input.KeyCode == Enum.KeyCode.H then
-        if isAuthorizedUser then
-            toggleUI()
-        else
-            toggleGodModePro()
-        end
+        toggleUIVisibility()
     elseif input.KeyCode == Enum.KeyCode.K then
         toggleKillAura()
     elseif input.KeyCode == Enum.KeyCode.J then
@@ -390,10 +515,16 @@ print("========================================")
 print("🔥 RAMZI GODMODE - VOXELS SCRIPT LOADED")
 print("========================================")
 print("Authorized User: " .. (isAuthorizedUser and playerName or "NO"))
+print("Platform: Mobile Compatible ✓")
 print("")
-print("KEY BINDINGS:")
+print("FEATURES:")
+print("✓ Tap ⚡ button to open/close UI")
+print("✓ Tap feature buttons to toggle")
+print("✓ Tap ▲▼ to adjust fly speed")
+print("")
+print("KEYBOARD BINDINGS (Desktop):")
 print("G - Toggle GodMode")
-print("H - Toggle GodMode Pro" .. (isAuthorizedUser and " / Toggle UI" or ""))
+print("H - Toggle UI")
 print("K - Toggle KillAura")
 print("J - Toggle OP KillAura V2")
 print("F - Toggle Fly")
